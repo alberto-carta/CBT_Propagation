@@ -1,0 +1,47 @@
+# Configuration file
+[general]
+  calcdir = "./out"
+  loadfile = false  # whether to load a previously saved chain or not
+
+  [general.chain]
+  #structural parameter of the chain	
+    Mers = 300     # number of monomers in the chain
+    dz = 3.4        # distance between monomers in the chain in Angstrom
+    coupling = true # true if you want coupling, false for isolated monomers
+    tripole = true  # true if you want tripole type coupling, false for usual dipole-dipole interaction
+    J_coupl = -0.12        # ignored if tripole=true, nearest neighbour coupling
+    neighbors = 5   # number of neighbors that feel the interactions
+
+    #local static disorder parameters
+    "σ" = 0.075 # 0.075 std deviation of the local gaussian disorder of the chain energies
+    L0 = 0.0   # correlation length in number of sites of the gaussian disorder
+
+    #vibronic coupling 
+    hw_vibr = 0.19375 # vibrational energy
+    "λ" = 0.75        # square root of the Huang-Rhys factor
+    n_vib = 1         # number of vibrational states, to fit the spectrum 5/6 is plenty, for propagations 1-2 is enough
+
+  [general.spectrum]
+    hw_00 = 2.6844  # difference in energy between the ground and excited electronic state
+    D_shift = 0.36  #0.36 gas-to-crystal shift, the final excitation energy will be hw_00-D_shift, 0 for monomers
+    "γ" = 0.026    # dynamic disorder, broadening of the spectrum
+
+  [general.tripole]
+    delz = 0.4    # effective distance taken from Saikin, accounts for an effective overlap of the wavefunctions
+    trp_fac = 4.1 # multiplicative factor that increases the magnitude of the effective charges
+    D_orth = 1    # number of orthogonal state, for the tripole model set to 2, otherwise defaults to 1
+    "θ" = 28.0    # rotation angle between tripoles
+
+[propagation]
+compute_propagation = true # set to false if you only want the spectrum
+
+  [propagation.bath]
+    kbT = 0.026 # thermal energy in eV, 0.026 is room temperature
+    wc = 100    # cutoff freq for ohmic bath, set to a high number (> 10e3*J) to avoid cutoff completely
+    Wo = 1     # coupling to bath constant, can go anywhere from 0.1J to 10e4*J (Bernardz2002, doi: 10.1063/1.1499483)
+
+  [propagation.chain]
+    #startpos = 0.026 # if present, initial starting position of the propagation, defaults to Mers/2
+    sigmastart = 420.0 # initial laser spot width, determines initial excitation in monomer distance
+    diff_lim = 220  # diffraction limit, broadening of the excitons during propagations in monomer distance
+

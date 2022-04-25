@@ -49,7 +49,7 @@ function FC_overlap_0K(e_vibr, HR_fac)
 end
 
 function gaussian(x, μ, σ)
-   prob = 1/(sqrt(2*π)*σ)*exp( -((x - μ)^2/σ^2) /2)
+   prob = 1/(sqrt(2*π)*σ^2)*exp( -((x - μ)^2/σ^2) /2)
    return prob
 end
 
@@ -68,18 +68,44 @@ function Boltz_weight(E, kbT)
   return occup
 end
 
-
 function Bose_weight(E, kbT)
     if E > 0
-        occup = 1/(exp((E+0.000001)/kbT)-1)
+      occup = 1/(exp(E/(kbT))-1)
     else
-        occup = 1+ 1/(exp((-E+0.000001)/kbT)-1)
+      occup = 1+1/(exp(-E/(kbT))-1)
     end
   return occup
 end
+
+
 
 function subdif_msd(t, alpha, A)
     msd = A*t^alpha
 
     return msd
 end
+
+function fit_msd(time_vec, MSD_vec; cut=40)
+  """
+  Inputs:
+  * time_vec (array of floats): timesteps in nanoseconds 
+  * MSD_vec (array of floats): Value of the MSD at the timesteps 
+  * cut (integer default = 40): cutoff to compute subdiffusion only with the first 'cut' timesteps
+
+  returns:
+  * coeffs (array of floats) : array containing [α , A]
+
+  """
+  
+  norm_time = time_vec[1:end].-time_vec[1]
+  norm_MSD = MSD_vec[1:end].-MSD_vec[1]
+
+
+  @. model(x, p) = subdif_msd(x, p[1], p[2])
+
+  fit = curve_fit(model, norm_time[1:cut], norm_MSD[1:cut], [0.5,0.5])
+  coeffs = coef(fit) 
+  return coeffs
+end
+
+
